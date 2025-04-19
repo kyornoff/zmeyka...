@@ -1,0 +1,499 @@
+/* Основные стили */
+body {
+    background-color: #000;
+    color: #00ff00;
+    font-family: 'Consolas', monospace;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+body.home .glitch {
+    font-size: 3.5em;
+    text-shadow: 0 0 10px #00ff00;
+    position: relative;
+    margin-bottom: 10px;
+}
+
+body:not(.home) .glitch {
+    font-size: 2em;
+    text-shadow: 0 0 10px #00ff00;
+    position: relative;
+    margin-bottom: 5px;
+}
+
+body.home .subtitle {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 2px solid #00ff00;
+    animation: typing 3s steps(40) forwards, blink-caret 0.75s step-end infinite;
+    width: 0;
+}
+
+body:not(.home) .subtitle {
+    display: none;
+}
+
+.crt-effect {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.6),
+        rgba(0, 0, 0, 0.6) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: 1;
+}
+
+#matrix-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.15;
+}
+
+.terminal {
+    width: 90%;
+    max-width: 1200px;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0);
+    /* border: 1px solid #00ff00;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3); */
+    overflow: hidden;
+}
+
+header {
+    text-align: center;
+    margin: 20px 0;
+    padding: 0 20px;
+}
+
+.menu ul {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 0;
+    list-style: none;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.menu a, .menu-btn {
+    color: #00ff00;
+    text-decoration: none;
+    padding: 5px 10px;
+    position: relative;
+    transition: all 0.3s;
+    cursor: pointer;
+    background-color: rgba(0, 40, 0, 0.5);
+    border: 1px solid #00ff33;
+    font-family: 'Consolas', monospace;
+    border-radius: 0;
+    outline: none;
+}
+
+.menu a:not(.disabled):hover, .menu-btn:hover {
+    text-shadow: 0 0 8px #00ff00;
+    background-color: rgba(0, 60, 0, 0.7);
+}
+
+.menu a:not(.disabled):hover::before, .menu-btn:hover::before {
+    content: ">";
+    position: absolute;
+    left: -15px;
+}
+
+.menu a:not(.disabled)::before, .menu-btn::before {
+    content: ">";
+    position: absolute;
+    left: -10px;
+    opacity: 0;
+    transition: opacity 0.2s, left 0.2s;
+}
+
+.menu a:not(.disabled):hover::before, .menu-btn:hover::before {
+    opacity: 1;
+    left: -15px;
+}
+
+.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    position: relative;
+}
+
+.disabled:hover::before {
+    content: none !important;
+}
+
+.content {
+    flex-grow: 1;
+    margin: 0 20px 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.terminal-window {
+    flex-grow: 1;
+    display: none;
+    border: 1px solid #00ff33;
+    background-color: rgba(0, 20, 0, 0.3);
+    flex-direction: column;
+}
+
+.terminal-window.active {
+    display: flex;
+    animation: fadeIn 0.3s;
+}
+
+.terminal-header {
+    background-color: rgba(0, 30, 0, 0.5);
+    padding: 5px 10px;
+    border-bottom: 1px solid #00ff33;
+    display: flex;
+    justify-content: space-between;
+}
+
+.terminal-body {
+    padding: 20px;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+/* Стили для игры */
+.game-screen-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.game-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: rgba(0, 10, 0, 0.3);
+}
+
+.game-screen.active {
+    display: flex;
+    animation: fadeIn 0.3s;
+}
+
+#game-area {
+    background-color: rgba(0, 0, 0, 0.7);
+    position: relative;
+}
+
+#game-canvas {
+    border: 1px solid #00ff33;
+    background-color: #000;
+    margin-bottom: 15px;
+    position: relative;
+    overflow: hidden;
+    background-image: 
+        linear-gradient(rgba(0, 255, 0, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 0, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    /* border-top-width: 3px; Увеличиваем верхнюю границу */
+}
+
+
+.game-info-right {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 5px 10px;
+    background-color: rgba(0, 30, 0, 0.3);
+    border: 1px solid #00ff33;
+}
+
+.nightmare-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s;
+}
+
+.nightmare-overlay:not(.hidden) {
+    opacity: 1;
+}
+
+.nightmare-text {
+    color: rgb(21, 255, 0);
+    text-shadow: 0 0 10px rgb(72, 255, 0);
+    font-size: 2em;
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typing 1s steps(40) forwards;
+}
+
+
+
+.game-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+    text-align: center;
+}
+
+.skin-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
+    width: 100%;
+    max-width: 300px;
+}
+
+.back-btn {
+    margin-top: 20px;
+}
+
+/* Матричный фон для игрового поля */
+.matrix-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.1;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Экран Game Over */
+#game-over-screen {
+    background-color: rgba(0, 10, 0, 0.3);
+}
+
+.game-over-content {
+    background-color: rgba(0, 20, 0, 0.8);
+    border: 1px solid #00ff33;
+    padding: 30px;
+    text-align: center;
+    max-width: 500px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.add-to-leaderboard {
+    display: flex;
+    align-items: center;
+    margin: 15px 0;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+#player-name {
+    background-color: rgba(0, 30, 0, 0.5);
+    border: 1px solid #00ff33;
+    color: #00ff00;
+    padding: 8px;
+    font-family: 'Consolas', monospace;
+    width: 200px;
+}
+
+.skin-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 30, 0, 0.8);
+    border: 1px solid #00ff33;
+    padding: 20px;
+    z-index: 100;
+    animation: fadeInOut 1s forwards;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; visibility: hidden; }
+}
+
+/* Таблица лидеров */
+.table-container {
+    overflow-y: scroll;
+    margin-top: 20px;
+    width: 100%;
+    height: calc(100% - 60px);
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+.table-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+.leaderboard {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.leaderboard th, .leaderboard td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #00ff33;
+}
+
+.leaderboard th {
+    background-color: rgba(0, 30, 0, 0.3);
+    font-weight: bold;
+}
+
+.leaderboard tr:hover {
+    background-color: rgba(0, 50, 0, 0.2);
+}
+
+.leaderboard tbody {
+    display: block;
+    max-height: 300px;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.leaderboard tbody::-webkit-scrollbar {
+    display: none;
+}
+.leaderboard thead, .leaderboard tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.leaderboard tbody tr td[colspan] {
+    color: #00ff00;
+    padding: 15px;
+    font-style: italic;
+}
+
+.leaderboard td:first-child {
+    font-weight: bold;
+    color: #00ff99;
+}
+
+.crypto-container {
+    margin-top: 30px;
+}
+
+.crypto-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: rgba(0, 30, 0, 0.2);
+    border: 1px solid #00ff33;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.crypto-name {
+    font-weight: bold;
+    min-width: 100px;
+}
+
+.status-bar {
+    border-top: 1px solid #00ff00;
+    padding: 8px 20px;
+    display: flex;
+    align-items: center;
+    background-color: rgba(0, 20, 0, 0.3);
+    position: relative;
+}
+
+.version {
+    margin-left: auto;
+    margin-right: 20px;
+}
+
+.blink {
+    animation: blink 1s step-end infinite;
+}
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 20%; }
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent; }
+    50% { border-color: currentColor; }
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.ascii-art {
+    margin: 30px 0;
+    color: #00cc00;
+    text-align: center;
+    font-size: 0.8em;
+    line-height: 1.2;
+}
+
+.accent {
+    color: #00ff99;
+    font-weight: bold;
+}
+
+/* Эффект при клике */
+.menu a:not(.disabled):active, .menu-btn:active {
+    transform: translateY(1px);
+}
