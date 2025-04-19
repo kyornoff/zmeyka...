@@ -115,26 +115,26 @@
             <div class="terminal-window section hidden" id="records">
                 <div class="terminal-header">
                     <span class="terminal-title">> LEADERBOARD</span>
+                    <span class="terminal-title">> остерегайтесь читеров:)</span>
                     <span class="terminal-controls">[X]</span>
                 </div>
                 <div class="terminal-body">
-                    <div id="records">
-                        <h2>Лидерборд</h2>
+                    <h2>> ТОП ИГРОКОВ</h2>
+                    <div class="table-container">
                         <table class="leaderboard">
                             <thead>
                                 <tr>
-                                    <th>Место</th>
+                                    <th>#</th>
                                     <th>Игрок</th>
-                                    <th>Очки</th>
+                                    <th>Счёт</th>
                                     <th>Дата</th>
                                     <th>Уровень</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Данные будут добавлены здесь -->
+                                <!-- Лидерборд будет заполняться динамически -->
                             </tbody>
                         </table>
-                    </div>
                     </div>
                 </div>
             </div>
@@ -168,8 +168,9 @@
         </div>
     </div>
 
+    <!-- Добавьте эти скрипты перед script.js -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
     <script src="script.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
 </body>
 </html>
