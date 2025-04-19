@@ -3,13 +3,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Инициализация Firebase
     const firebaseConfig = {
-        apiKey: "AIzaSyD5mY4XJzQ3Q3Q3Q3Q3Q3Q3Q3Q3Q3Q3Q3Q",
-        authDomain: "zmeyka-leaderboard.firebaseapp.com",
-        databaseURL: "https://zmeyka-leaderboard-default-rtdb.firebaseio.com",
-        projectId: "zmeyka-leaderboard",
-        storageBucket: "zmeyka-leaderboard.appspot.com",
-        messagingSenderId: "123456789012",
-        appId: "1:123456789012:web:3e3e3e3e3e3e3e3e3e3e3e"
+      apiKey: "AIzaSyALPmlcf9H8OIFdb563Qe79y9MQObIYlG0",
+      authDomain: "zmeyka-55b6f.firebaseapp.com",
+      databaseURL: "https://zmeyka-55b6f-default-rtdb.firebaseio.com",
+      projectId: "zmeyka-55b6f",
+      storageBucket: "zmeyka-55b6f.firebasestorage.app",
+      messagingSenderId: "809092808010",
+      appId: "1:809092808010:web:0827a7adad61c18813d5b3",
+      measurementId: "G-W8PYS9BD4T"
     };
     
     // Инициализируем Firebase
