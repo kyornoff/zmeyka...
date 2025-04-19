@@ -1,6 +1,21 @@
 document.addEventListener('DOMContentLoaded', function() {
     document.body.classList.add('home');
     
+    // Инициализация Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyALPmlcf9H8OIFdb563Qe79y9MQObIYlG0",
+        authDomain: "zmeyka-55b6f.firebaseapp.com",
+        projectId: "zmeyka-55b6f",
+        storageBucket: "zmeyka-55b6f.firebasestorage.app",
+        messagingSenderId: "809092808010",
+        appId: "1:809092808010:web:0827a7adad61c18813d5b3",
+        measurementId: "G-W8PYS9BD4T"
+      };
+    
+    // Инициализируем Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    
     // Матричный фон
     const matrixCanvas = document.getElementById('matrix-canvas');
     const matrixCtx = matrixCanvas.getContext('2d');
@@ -67,12 +82,6 @@ document.addEventListener('DOMContentLoaded', function() {
             this.finalScoreElement = document.getElementById('final-score');
             this.levelElement = document.getElementById('level');
             this.playerNameInput = document.getElementById('player-name');
-
-            this.leaderboardResetInterval = null;
-            this.touchStartX = 0;
-            this.touchStartY = 0;
-            this.touchEndX = 0;
-            this.touchEndY = 0;
             
             this.cellSize = 20;
             this.width = 30;
@@ -97,61 +106,51 @@ document.addEventListener('DOMContentLoaded', function() {
             
             this.initEventListeners();
             this.initMenuEventListeners();
-            this.initSwipeControls();
-            this.setupAutoResetLeaderboard();
+            this.initFirebase();
+            this.startLeaderboardResetTimer();
         }
         
-        initSwipeControls() {
-            if (!('ontouchstart' in window)) return;
-            
-            const gameArea = document.getElementById('game-area');
-            
-            gameArea.addEventListener('touchstart', (e) => {
-                this.touchStartX = e.changedTouches[0].screenX;
-                this.touchStartY = e.changedTouches[0].screenY;
-            }, false);
-            
-            gameArea.addEventListener('touchend', (e) => {
-                this.touchEndX = e.changedTouches[0].screenX;
-                this.touchEndY = e.changedTouches[0].screenY;
-                this.handleSwipe();
-            }, false);
+        initFirebase() {
+            this.leaderboardRef = firebase.database().ref('leaderboard');
+            this.resetTimerRef = firebase.database().ref('resetTimer');
         }
         
-        handleSwipe() {
-            const dx = this.touchEndX - this.touchStartX;
-            const dy = this.touchEndY - this.touchStartY;
-            
-            // Определяем направление свайпа
-            if (Math.abs(dx) > Math.abs(dy)) {
-                // Горизонтальный свайп
-                if (dx > 0 && this.direction !== 'left') {
-                    this.nextDirection = 'right';
-                } else if (dx < 0 && this.direction !== 'right') {
-                    this.nextDirection = 'left';
+        startLeaderboardResetTimer() {
+            // Проверяем, нужно ли сбросить лидерборд
+            this.resetTimerRef.on('value', (snapshot) => {
+                const resetTime = snapshot.val();
+                if (resetTime && resetTime.nextReset) {
+                    const now = Date.now();
+                    const nextReset = new Date(resetTime.nextReset).getTime();
+                    
+                    if (now >= nextReset) {
+                        this.resetLeaderboard();
+                    } else {
+                        // Устанавливаем таймер до следующего сброса
+                        const timeLeft = nextReset - now;
+                        setTimeout(() => this.resetLeaderboard(), timeLeft);
+                    }
+                } else {
+                    // Если время сброса не установлено, устанавливаем его
+                    this.setNextResetTime();
                 }
-            } else {
-                // Вертикальный свайп
-                if (dy > 0 && this.direction !== 'up') {
-                    this.nextDirection = 'down';
-                } else if (dy < 0 && this.direction !== 'down') {
-                    this.nextDirection = 'up';
-                }
-            }
+            });
         }
         
-        setupAutoResetLeaderboard() {
-            // Очищаем предыдущий интервал, если был
-            if (this.leaderboardResetInterval) {
-                clearInterval(this.leaderboardResetInterval);
-            }
+        setNextResetTime() {
+            const now = new Date();
+            const nextReset = new Date(now.getTime() + 60000); // 1 минута
             
-            // Устанавливаем новый интервал (1 минута = 60000 мс)
-            this.leaderboardResetInterval = setInterval(() => {
-                if (localStorage.getItem('zmeykaLeaderboard')) {
-                    console.log('Автоматический сброс лидерборда');
-                    localStorage.removeItem('zmeykaLeaderboard');
-                    this.updateLeaderboard();
+            this.resetTimerRef.set({
+                nextReset: nextReset.toISOString()
+            });
+        }
+        
+        resetLeaderboard() {
+            this.leaderboardRef.remove()
+                .then(() => {
+                    console.log('Leaderboard reset');
+                    this.setNextResetTime();
                     
                     // Показываем уведомление о сбросе
                     const resetMsg = document.createElement('div');
@@ -159,11 +158,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     resetMsg.textContent = 'Лидерборд был автоматически сброшен';
                     document.body.appendChild(resetMsg);
                     setTimeout(() => resetMsg.remove(), 2000);
-                }
-            }, 60000); // 1 минута в миллисекундах
-            
-            // Инициализируем лидерборд сразу
-            this.updateLeaderboard();
+                })
+                .catch(error => {
+                    console.error('Error resetting leaderboard:', error);
+                });
         }
         
         showScreen(screenId) {
@@ -524,46 +522,63 @@ document.addEventListener('DOMContentLoaded', function() {
                 name: playerName,
                 score: this.score,
                 level: this.difficulty,
-                date: new Date().toLocaleDateString()
+                date: new Date().toLocaleString(),
+                timestamp: firebase.database.ServerValue.TIMESTAMP
             };
             
-            let leaderboard = JSON.parse(localStorage.getItem('zmeykaLeaderboard') || '[]');
-            leaderboard.push(scoreData);
-            leaderboard.sort((a, b) => b.score - a.score);
-            
-            localStorage.setItem('zmeykaLeaderboard', JSON.stringify(leaderboard));
-            this.updateLeaderboard();
-            
-            this.addToLeaderboard.classList.add('hidden');
-            this.playerNameInput.value = '';
+            // Добавляем результат в Firebase
+            this.leaderboardRef.push(scoreData)
+                .then(() => {
+                    console.log('Score added to leaderboard');
+                    this.addToLeaderboard.classList.add('hidden');
+                    this.playerNameInput.value = '';
+                })
+                .catch(error => {
+                    console.error('Error adding score:', error);
+                });
         }
         
         updateLeaderboard() {
             const recordsTable = document.querySelector('#records .leaderboard tbody');
             if (!recordsTable) return;
             
-            const leaderboard = JSON.parse(localStorage.getItem('zmeykaLeaderboard') || '[]');
-            recordsTable.innerHTML = '';
+            recordsTable.innerHTML = '<tr><td colspan="5" style="text-align: center;">Загрузка лидерборда...</td></tr>';
             
-            if (leaderboard.length === 0) {
-                const row = document.createElement('tr');
-                row.innerHTML = `<td colspan="5" style="text-align: center;">Лидерборд пуст</td>`;
-                recordsTable.appendChild(row);
-                return;
-            }
-            
-            leaderboard.sort((a, b) => b.score - a.score)
-                .slice(0, 20)
-                .forEach((record, index) => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${index + 1}</td>
-                        <td>${record.name}</td>
-                        <td>${record.score}</td>
-                        <td>${record.date}</td>
-                        <td>${this.getLevelName(record.level)}</td>
-                    `;
-                    recordsTable.appendChild(row);
+            // Получаем данные из Firebase и сортируем их по убыванию счета
+            this.leaderboardRef.orderByChild('score').limitToLast(20).once('value')
+                .then((snapshot) => {
+                    const leaderboard = [];
+                    snapshot.forEach((childSnapshot) => {
+                        leaderboard.push(childSnapshot.val());
+                    });
+                    
+                    // Сортируем по убыванию счета
+                    leaderboard.sort((a, b) => b.score - a.score);
+                    
+                    recordsTable.innerHTML = '';
+                    
+                    if (leaderboard.length === 0) {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `<td colspan="5" style="text-align: center;">Лидерборд пуст</td>`;
+                        recordsTable.appendChild(row);
+                        return;
+                    }
+                    
+                    leaderboard.slice(0, 20).forEach((record, index) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${index + 1}</td>
+                            <td>${record.name}</td>
+                            <td>${record.score}</td>
+                            <td>${record.date}</td>
+                            <td>${this.getLevelName(record.level)}</td>
+                        `;
+                        recordsTable.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading leaderboard:', error);
+                    recordsTable.innerHTML = '<tr><td colspan="5" style="text-align: center;">Ошибка загрузки лидерборда</td></tr>';
                 });
         }
         
@@ -579,6 +594,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     const game = new SnakeGame();
+    
+    // Обновляем лидерборд при открытии вкладки
+    document.querySelector('a[href="#records"]').addEventListener('click', () => {
+        game.updateLeaderboard();
+    });
     
     document.querySelectorAll('.copy-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -624,68 +644,4 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
 });
-const firebaseConfig = {
-    apiKey: "AIzaSyALPmlcf9H8OIFdb563Qe79y9MQObIYlG0",
-    authDomain: "zmeyka-55b6f.firebaseapp.com",
-    projectId: "zmeyka-55b6f",
-    storageBucket: "zmeyka-55b6f.firebasestorage.app",
-    messagingSenderId: "809092808010",
-    appId: "1:809092808010:web:0827a7adad61c18813d5b3",
-    measurementId: "G-W8PYS9BD4T"
-};
-
-// Инициализация приложения
-const app = firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
-
-// Функция для добавления рекорда в таблицу
-function addScoreToLeaderboard(playerName, score, level) {
-    const newScoreRef = database.ref('leaderboard').push();
-    newScoreRef.set({
-        name: playerName,
-        score: score,
-        level: level,
-        date: new Date().toLocaleString()
-    });
-}
-
-// Функция для получения рекордов
-function getLeaderboard() {
-    database.ref('leaderboard').orderByChild('score').limitToLast(10).once('value', (snapshot) => {
-        const leaderboard = [];
-        snapshot.forEach(childSnapshot => {
-            leaderboard.push(childSnapshot.val());
-        });
-        updateLeaderboard(leaderboard.reverse()); // Обновляем таблицу
-    });
-}
-// Обновление таблицы рекордов
-function updateLeaderboard(leaderboard) {
-    const recordsTable = document.querySelector('#records .leaderboard tbody');
-    recordsTable.innerHTML = ''; // Очищаем таблицу
-    leaderboard.forEach((record, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${record.name}</td>
-            <td>${record.score}</td>
-            <td>${record.date}</td>
-            <td>${getLevelName(record.level)}</td>
-        `;
-        recordsTable.appendChild(row);
-    });
-}
-document.addEventListener('DOMContentLoaded', getLeaderboard);
-function addScoreToLeaderboard(playerName, score, level) {
-    const newScoreRef = database.ref('leaderboard').push();
-    newScoreRef.set({
-        name: playerName,
-        score: score,
-        level: level,
-        date: new Date().toLocaleString()
-    });
-}
-// Вызывайте getLeaderboard() при загрузке страницы
-getLeaderboard();
