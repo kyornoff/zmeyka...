@@ -381,7 +381,7 @@ header {
 }
 
 .leaderboard th, .leaderboard td {
-    padding: 12px 15px;
+    padding: 12px 10px; /* Можно уменьшить padding */
     text-align: left;
     border-bottom: 1px solid #00ff33;
 }
