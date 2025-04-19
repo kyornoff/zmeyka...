@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZNEYKA | Хакерская змейка</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="crt-effect"></div>
+    <canvas id="matrix-canvas"></canvas>
+    <div class="gradient-bg"></div>
+    
+    <div class="terminal">
+        <header>
+            <h1 class="glitch" data-text=">_ ZNEYKA">>_ zmeyka</h1>
+            <p class="subtitle">//ПРОСТО КОНСОЛЬНАЯ ЗМЕЙКА</p>
+        </header>
+
+        <nav class="menu">
+            <ul>
+                <li><a href="#main" class="active">Главная</a></li>
+                <li><a href="#play">Играть</a></li>
+                <li><a href="#records">Рекорды</a></li>
+                <li><a href="#donate">Донат</a></li>
+            </ul>
+        </nav>
+        
+        <div class="content" id="main-content">
+            <div class="terminal-window section active" id="main">
+                <div class="terminal-header">
+                    <span class="terminal-title">> MAINFRAME</span>
+                    <span class="terminal-controls">[X]</span>
+                </div>
+                <div class="terminal-body">
+                    <h2>> zmeyka...</h2>
+                    <div class="features">
+                        <!-- <p>> <span class="accent">РЕТРО-СТИЛЬ:</span> Настоящий терминальный хакерский геймплей.</p> -->
+                        <p>> <span class="accent">СЛОЖНОСТЬ:</span> 4 уровня, от "лёгкого" до "nightmare".</p>
+                        <p>> <span class="accent">ГЛОБАЛЬНАЯ ДОСКА РЕКОРДОВ:</span> Сразись за ТОП 1 в лидерборде</p>
+                    </div>
+                    <div class="ascii-art">
+                        <pre>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="terminal-window section hidden" id="play">
+                <div class="terminal-header">
+                    <span class="terminal-title">> zmeyka...</span>
+                    <span class="terminal-controls">[X]</span>
+                </div>
+                <div class="terminal-body">
+                    <div class="game-screen-container">
+                        <div class="game-screen active" id="game-main-menu">
+                            <h2>> ZNEYKA GAME</h2>
+                            <div class="game-buttons">
+                                <button class="menu-btn" id="play-btn">ИГРАТЬ</button>
+                                <button class="menu-btn" id="skins-btn">СКИНЫ</button>
+                            </div>
+                        </div>
+                        
+                        <div class="game-screen" id="game-difficulty-menu">
+                            <h2>> ВЫБЕРИТЕ СЛОЖНОСТЬ</h2>
+                            <div class="game-buttons">
+                                <button class="menu-btn game-btn" data-difficulty="easy">ЛЕГКИЙ (150ms)</button>
+                                <button class="menu-btn game-btn" data-difficulty="normal">НОРМАЛЬНЫЙ (100ms)</button>
+                                <button class="menu-btn game-btn" data-difficulty="hard">ТЯЖЁЛЫЙ (50ms)</button>
+                                <button class="menu-btn game-btn" data-difficulty="nightmare">NIGHTMARE (15ms)</button>
+                            </div>
+                            <button class="menu-btn back-btn">НАЗАД</button>
+                        </div>
+                        
+                        <div class="game-screen" id="game-skins-menu">
+                            <h2>> ВЫБОР СКИНА</h2>
+                            <div class="skin-options">
+                                <h3>> Змейка:</h3>
+                                <button class="menu-btn skin-btn" data-skin="0" data-type="snake">0</button>
+                                <button class="menu-btn skin-btn" data-skin="*" data-type="snake">*</button>
+                                
+                                <h3>> Яблоко:</h3>
+                                <button class="menu-btn skin-btn" data-skin="X" data-type="apple">X</button>
+                                <button class="menu-btn skin-btn" data-skin="O" data-type="apple">O</button>
+                            </div>
+                            <button class="menu-btn back-btn">НАЗАД</button>
+                        </div>
+                        
+                        <div class="game-screen" id="game-area">
+                            <canvas id="game-canvas"></canvas>
+                            <div class="game-info-right">
+                                <span>Счёт: <span id="score">0</span></span>
+                                <span>Уровень: <span id="level">easy</span></span>
+                            </div>
+                        </div>
+                        
+                        <div class="game-screen" id="game-over-screen">
+                            <div class="game-over-content">
+                                <h2>> GAME OVER</h2>
+                                <p>Ваш счёт: <span id="final-score">0</span></p>
+                                <div class="add-to-leaderboard hidden" id="add-to-leaderboard">
+                                    <input type="text" id="player-name" placeholder="Введите ваш никнейм" maxlength="15">
+                                    <button class="menu-btn" id="submit-score">Добавить в лидерборд</button>
+                                </div>
+                                <div class="game-buttons">
+                                    <button class="menu-btn" id="play-again">Играть снова</button>
+                                    <button class="menu-btn" id="back-to-menu">Вернуться в меню</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="terminal-window section hidden" id="records">
+                <div class="terminal-header">
+                    <span class="terminal-title">> LEADERBOARD</span>
+                    <span class="terminal-controls">[X]</span>
+                </div>
+                <div class="terminal-body">
+                    <h2>> ТОП ИГРОКОВ</h2>
+                    <div class="table-container">
+                        <table class="leaderboard">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Игрок</th>
+                                    <th>Счёт</th>
+                                    <th>Дата</th>
+                                    <th>Уровень</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Лидерборд будет заполняться динамически -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="terminal-window section hidden" id="donate">
+                <div class="terminal-header">
+                    <span class="terminal-title">> DONATE</span>
+                    <span class="terminal-controls">[X]</span>
+                </div>
+                <div class="terminal-body">
+                    <h2>> ПОДДЕРЖАТЬ ПРОЕКТ</h2>
+                    <div class="crypto-container">
+                        <div class="crypto-item">
+                            <span class="crypto-name">Bitcoin (BTC):</span>
+                            <span class="crypto-address">bc1qexampleaddress</span>
+                            <button class="menu-btn copy-btn" data-address="bc1qexampleaddress">COPY</button>
+                        </div>
+                        <div class="crypto-item">
+                            <span class="crypto-name">Ethereum (ETH):</span>
+                            <span class="crypto-address">0x71Cexampleaddress</span>
+                            <button class="menu-btn copy-btn" data-address="0x71Cexampleaddress">COPY</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="status-bar">
+            <span class="blink">_</span>
+            <span class="version">v1.0.0</span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
