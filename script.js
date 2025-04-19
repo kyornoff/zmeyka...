@@ -624,4 +624,60 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
 });
+const firebaseConfig = {
+    apiKey: "AIzaSyALPmlcf9H8OIFdb563Qe79y9MQObIYlG0",
+    authDomain: "zmeyka-55b6f.firebaseapp.com",
+    projectId: "zmeyka-55b6f",
+    storageBucket: "zmeyka-55b6f.firebasestorage.app",
+    messagingSenderId: "809092808010",
+    appId: "1:809092808010:web:0827a7adad61c18813d5b3",
+    measurementId: "G-W8PYS9BD4T"
+};
+
+// Инициализация приложения
+const app = firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+// Функция для добавления рекорда в таблицу
+function addScoreToLeaderboard(playerName, score, level) {
+    const newScoreRef = database.ref('leaderboard').push();
+    newScoreRef.set({
+        name: playerName,
+        score: score,
+        level: level,
+        date: new Date().toLocaleString()
+    });
+}
+
+// Функция для получения рекордов
+function getLeaderboard() {
+    database.ref('leaderboard').orderByChild('score').limitToLast(10).once('value', (snapshot) => {
+        const leaderboard = [];
+        snapshot.forEach(childSnapshot => {
+            leaderboard.push(childSnapshot.val());
+        });
+        updateLeaderboard(leaderboard.reverse()); // Обновляем таблицу
+    });
+}
+
+// Обновление таблицы рекордов
+function updateLeaderboard(leaderboard) {
+    const recordsTable = document.querySelector('#records .leaderboard tbody');
+    recordsTable.innerHTML = '';
+    leaderboard.forEach((record, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${record.name}</td>
+            <td>${record.score}</td>
+            <td>${record.date}</td>
+            <td>${getLevelName(record.level)}</td>
+        `;
+        recordsTable.appendChild(row);
+    });
+}
+
+// Вызывайте getLeaderboard() при загрузке страницы
+getLeaderboard();
