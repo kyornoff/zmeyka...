@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZNEYKA | Мобильная версия не поддерживается</title>
+    <style>
+        /* Базовые стили */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            color: #00ff00;
+            font-family: 'Consolas', monospace;
+        }
+
+        /* Контейнер контента */
+        .mobile-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 10; /* Выше фона, но ниже эффектов */
+        }
+
+        /* Стили текста */
+        .glitch {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            position: relative;
+            text-shadow: 0 0 10px #00ff00;
+        }
+        .mobile-message {
+            font-size: 1.2rem;
+            max-width: 80%;
+            line-height: 1.5;
+        }
+
+        /* Матричный фон */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.15;
+        }
+
+        /* CRT эффект (должен быть поверх всего) */
+        .crt-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                /* Горизонтальные линии */
+                repeating-linear-gradient(
+                    to bottom,
+                    rgba(0, 0, 0, 0.6),
+                    rgba(0, 0, 0, 0.6) 1px,
+                    transparent 1px,
+                    transparent 2px
+                );
+            pointer-events: none;
+            z-index: 100; /* Самый верхний слой */
+        }
+
+        /* Дополнительные CRT эффекты */
+        .crt-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(rgba(18, 16, 16, 0.1) 50%, 
+                rgba(0, 0, 0, 0.25) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), 
+                rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 0; /* Между контентом и фоном */
+        }
+    </style>
+</head>
+<body>
+    <!-- Матричный фон -->
+    <canvas id="matrix-canvas"></canvas>
+    
+    <!-- Контент -->
+    <div class="mobile-container">
+        <h1 class="glitch" data-text=">_ ZNEYKA">>_ zmeyka</h1>
+        <p class="mobile-message">Извините, но сайт не поддерживает игру на телефонах :(</p>
+    </div>
+
+    <!-- CRT эффекты -->
+    <div class="crt-overlay"></div>
+    <div class="crt-effect"></div>
+
+    <script>
+        // Матричный эффект
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function initMatrix() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const chars = "アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン";
+            const fontSize = 14;
+            const columns = Math.floor(canvas.width / fontSize);
+            
+            const drops = [];
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.random() * -100;
+            }
+            
+            function draw() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = '#0F0';
+                ctx.font = fontSize + 'px monospace';
+                
+                for (let i = 0; i < drops.length; i++) {
+                    const text = chars[Math.floor(Math.random() * chars.length)];
+                    const x = i * fontSize;
+                    const y = drops[i] * fontSize;
+                    
+                    ctx.fillText(text, x, y);
+                    
+                    if (y > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    
+                    drops[i]++;
+                }
+            }
+            
+            setInterval(draw, 50);
+        }
+        
+        // Инициализация при загрузке и ресайзе
+        window.addEventListener('resize', initMatrix);
+        initMatrix();
+
+        // Эффект глитча для заголовка
+        const glitch = document.querySelector('.glitch');
+        let isGlitching = false;
+        
+        function applyGlitch() {
+            if (isGlitching) return;
+            
+            isGlitching = true;
+            const originalText = glitch.textContent;
+            const glitchText = glitch.getAttribute('data-text') || originalText;
+            
+            let iterations = 0;
+            const glitchInterval = setInterval(() => {
+                iterations++;
+                
+                // Случайные искажения
+                if (iterations % 3 === 0) {
+                    glitch.textContent = glitchText.split('').map(c => 
+                        Math.random() > 0.9 ? String.fromCharCode(33 + Math.random() * 94) : c
+                    ).join('');
+                    
+                    glitch.style.textShadow = `0 0 10px #00ff00, 
+                        ${Math.random() * 6 - 3}px ${Math.random() * 6 - 3}px 0 rgba(0,255,0,0.5)`;
+                } else {
+                    glitch.textContent = glitchText;
+                }
+                
+                if (iterations > 20) {
+                    clearInterval(glitchInterval);
+                    glitch.textContent = originalText;
+                    glitch.style.textShadow = '0 0 10px #00ff00';
+                    isGlitching = false;
+                    
+                    // Следующий глитч через случайный интервал
+                    setTimeout(applyGlitch, 1000 + Math.random() * 4000);
+                }
+            }, 50);
+        }
+        
+        // Запускаем первый глитч
+        setTimeout(applyGlitch, 1000);
+    </script>
+</body>
+</html>
