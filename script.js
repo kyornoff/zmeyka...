@@ -661,11 +661,10 @@ function getLeaderboard() {
         updateLeaderboard(leaderboard.reverse()); // Обновляем таблицу
     });
 }
-
 // Обновление таблицы рекордов
 function updateLeaderboard(leaderboard) {
     const recordsTable = document.querySelector('#records .leaderboard tbody');
-    recordsTable.innerHTML = '';
+    recordsTable.innerHTML = ''; // Очищаем таблицу
     leaderboard.forEach((record, index) => {
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -678,6 +677,15 @@ function updateLeaderboard(leaderboard) {
         recordsTable.appendChild(row);
     });
 }
-
+document.addEventListener('DOMContentLoaded', getLeaderboard);
+function addScoreToLeaderboard(playerName, score, level) {
+    const newScoreRef = database.ref('leaderboard').push();
+    newScoreRef.set({
+        name: playerName,
+        score: score,
+        level: level,
+        date: new Date().toLocaleString()
+    });
+}
 // Вызывайте getLeaderboard() при загрузке страницы
 getLeaderboard();
