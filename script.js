@@ -3,14 +3,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Инициализация Firebase
     const firebaseConfig = {
-        apiKey: "AIzaSyALPmlcf9H8OIFdb563Qe79y9MQObIYlG0",
-        authDomain: "zmeyka-55b6f.firebaseapp.com",
-        projectId: "zmeyka-55b6f",
-        storageBucket: "zmeyka-55b6f.firebasestorage.app",
-        messagingSenderId: "809092808010",
-        appId: "1:809092808010:web:0827a7adad61c18813d5b3",
-        measurementId: "G-W8PYS9BD4T"
-      };
+        apiKey: "AIzaSyD5mY4XJzQ3Q3Q3Q3Q3Q3Q3Q3Q3Q3Q3Q3Q",
+        authDomain: "zmeyka-leaderboard.firebaseapp.com",
+        databaseURL: "https://zmeyka-leaderboard-default-rtdb.firebaseio.com",
+        projectId: "zmeyka-leaderboard",
+        storageBucket: "zmeyka-leaderboard.appspot.com",
+        messagingSenderId: "123456789012",
+        appId: "1:123456789012:web:3e3e3e3e3e3e3e3e3e3e3e"
+    };
     
     // Инициализируем Firebase
     firebase.initializeApp(firebaseConfig);
@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         setNextResetTime() {
             const now = new Date();
-            const nextReset = new Date(now.getTime() + 60000); // 1 минута
+            const nextReset = new Date(now.getTime() + 3600000); // 1 час = 3600000 мс
             
             this.resetTimerRef.set({
                 nextReset: nextReset.toISOString()
@@ -542,9 +542,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const recordsTable = document.querySelector('#records .leaderboard tbody');
             if (!recordsTable) return;
             
-            recordsTable.innerHTML = '<tr><td colspan="5" style="text-align: center;">Загрузка лидерборда...</td></tr>';
+            recordsTable.innerHTML = '<tr><td colspan="4" style="text-align: center;">Загрузка лидерборда...</td></tr>';
             
-            // Получаем данные из Firebase и сортируем их по убыванию счета
             this.leaderboardRef.orderByChild('score').limitToLast(20).once('value')
                 .then((snapshot) => {
                     const leaderboard = [];
@@ -552,14 +551,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         leaderboard.push(childSnapshot.val());
                     });
                     
-                    // Сортируем по убыванию счета
                     leaderboard.sort((a, b) => b.score - a.score);
                     
                     recordsTable.innerHTML = '';
                     
                     if (leaderboard.length === 0) {
                         const row = document.createElement('tr');
-                        row.innerHTML = `<td colspan="5" style="text-align: center;">Лидерборд пуст</td>`;
+                        row.innerHTML = `<td colspan="4" style="text-align: center;">Лидерборд пуст</td>`;
                         recordsTable.appendChild(row);
                         return;
                     }
@@ -570,7 +568,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             <td>${index + 1}</td>
                             <td>${record.name}</td>
                             <td>${record.score}</td>
-                            <td>${record.date}</td>
                             <td>${this.getLevelName(record.level)}</td>
                         `;
                         recordsTable.appendChild(row);
@@ -578,7 +575,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .catch(error => {
                     console.error('Error loading leaderboard:', error);
-                    recordsTable.innerHTML = '<tr><td colspan="5" style="text-align: center;">Ошибка загрузки лидерборда</td></tr>';
+                    recordsTable.innerHTML = '<tr><td colspan="4" style="text-align: center;">Ошибка загрузки лидерборда</td></tr>';
                 });
         }
         
