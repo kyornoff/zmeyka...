@@ -4,6 +4,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZNEYKA | Хакерская змейка</title>
+
+    <script>
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+        
+        if (isMobileDevice()) {
+            document.write(`
+                <style>
+                    body {
+                        background-color: #000;
+                        color: #00ff00;
+                        font-family: 'Consolas', monospace;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                        margin: 0;
+                        overflow: hidden;
+                    }
+                    .mobile-message {
+                        text-align: center;
+                        padding: 20px;
+                        max-width: 80%;
+                    }
+                    .glitch {
+                        font-size: 3em;
+                        margin-bottom: 20px;
+                        text-shadow: 0 0 10px #00ff00;
+                        position: relative;
+                    }
+                    .crt-effect {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: repeating-linear-gradient(
+                            to bottom,
+                            rgba(0, 0, 0, 0.6),
+                            rgba(0, 0, 0, 0.6) 1px,
+                            transparent 1px,
+                            transparent 2px
+                        );
+                        pointer-events: none;
+                        z-index: -1;
+                    }
+                    #matrix-canvas {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        z-index: -2;
+                        opacity: 0.15;
+                    }
+                </style>
+                <div class="crt-effect"></div>
+                <canvas id="matrix-canvas"></canvas>
+                <div class="mobile-message">
+                    <h1 class="glitch" data-text=">_ ZNEYKA">>_ zmeyka</h1>
+                    <p>Извините, но сайт не поддерживает игру на телефонах :(</p>
+                </div>
+            `);
+            
+            // Останавливаем загрузку остального контента
+            throw new Error("Mobile device detected");
+        }
+    </script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -115,7 +184,7 @@
             <div class="terminal-window section hidden" id="records">
                 <div class="terminal-header">
                     <span class="terminal-title">> LEADERBOARD</span>
-                    <span class="terminal-title">> остерегайтесь читеров:)</span>
+                    <span class="terminal-title">> beware of cheaters:)</span>
                     <span class="terminal-controls">[X]</span>
                 </div>
                 <div class="terminal-body">
@@ -127,8 +196,7 @@
                                     <th>#</th>
                                     <th>Игрок</th>
                                     <th>Счёт</th>
-                                    <th>Дата</th>
-                                    <th>Уровень</th>
+                                    <th>Уровень</th> <!-- Убрали колонку "Дата" -->
                                 </tr>
                             </thead>
                             <tbody>
@@ -148,13 +216,13 @@
                     <h2>> ПОДДЕРЖАТЬ ПРОЕКТ</h2>
                     <div class="crypto-container">
                         <div class="crypto-item">
-                            <span class="crypto-name">Bitcoin (BTC):</span>
-                            <span class="crypto-address">bc1qexampleaddress</span>
+                            <span class="crypto-name">Bitcoin (BTC)</span>
+                            <span class="crypto-address"></span>
                             <button class="menu-btn copy-btn" data-address="bc1qexampleaddress">COPY</button>
                         </div>
                         <div class="crypto-item">
-                            <span class="crypto-name">Ethereum (ETH):</span>
-                            <span class="crypto-address">0x71Cexampleaddress</span>
+                            <span class="crypto-name">Ethereum (ETH)</span>
+                            <span class="crypto-address"></span>
                             <button class="menu-btn copy-btn" data-address="0x71Cexampleaddress">COPY</button>
                         </div>
                     </div>
@@ -164,7 +232,7 @@
         
         <div class="status-bar">
             <span class="blink">_</span>
-            <span class="version">v1.0.0</span>
+            <span class="version">v1.0.0 beta</span>
         </div>
     </div>
 
