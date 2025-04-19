@@ -544,13 +544,17 @@ document.addEventListener('DOMContentLoaded', function() {
             
             recordsTable.innerHTML = '<tr><td colspan="4" style="text-align: center;">Загрузка лидерборда...</td></tr>';
             
+            // Исправленный запрос - сортируем по score в убывающем порядке и ограничиваем 20 записями
             this.leaderboardRef.orderByChild('score').limitToLast(20).once('value')
                 .then((snapshot) => {
                     const leaderboard = [];
                     snapshot.forEach((childSnapshot) => {
-                        leaderboard.push(childSnapshot.val());
+                        const data = childSnapshot.val();
+                        data.id = childSnapshot.key; // Добавляем ID записи
+                        leaderboard.push(data);
                     });
                     
+                    // Сортируем по убыванию score
                     leaderboard.sort((a, b) => b.score - a.score);
                     
                     recordsTable.innerHTML = '';
@@ -562,12 +566,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         return;
                     }
                     
+                    // Выводим топ-20
                     leaderboard.slice(0, 20).forEach((record, index) => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td>${index + 1}</td>
-                            <td>${record.name}</td>
-                            <td>${record.score}</td>
+                            <td>${record.name || 'Anonymous'}</td>
+                            <td>${record.score || 0}</td>
                             <td>${this.getLevelName(record.level)}</td>
                         `;
                         recordsTable.appendChild(row);
@@ -578,6 +583,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     recordsTable.innerHTML = '<tr><td colspan="4" style="text-align: center;">Ошибка загрузки лидерборда</td></tr>';
                 });
         }
+        
         
         getLevelName(level) {
             switch(level) {
