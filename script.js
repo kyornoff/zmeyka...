@@ -69,6 +69,10 @@ document.addEventListener('DOMContentLoaded', function() {
             this.playerNameInput = document.getElementById('player-name');
 
             this.leaderboardResetInterval = null;
+            this.touchStartX = 0;
+            this.touchStartY = 0;
+            this.touchEndX = 0;
+            this.touchEndY = 0;
             
             this.cellSize = 20;
             this.width = 30;
@@ -93,6 +97,73 @@ document.addEventListener('DOMContentLoaded', function() {
             
             this.initEventListeners();
             this.initMenuEventListeners();
+            this.initSwipeControls();
+            this.setupAutoResetLeaderboard();
+        }
+        
+        initSwipeControls() {
+            if (!('ontouchstart' in window)) return;
+            
+            const gameArea = document.getElementById('game-area');
+            
+            gameArea.addEventListener('touchstart', (e) => {
+                this.touchStartX = e.changedTouches[0].screenX;
+                this.touchStartY = e.changedTouches[0].screenY;
+            }, false);
+            
+            gameArea.addEventListener('touchend', (e) => {
+                this.touchEndX = e.changedTouches[0].screenX;
+                this.touchEndY = e.changedTouches[0].screenY;
+                this.handleSwipe();
+            }, false);
+        }
+        
+        handleSwipe() {
+            const dx = this.touchEndX - this.touchStartX;
+            const dy = this.touchEndY - this.touchStartY;
+            
+            // Определяем направление свайпа
+            if (Math.abs(dx) > Math.abs(dy)) {
+                // Горизонтальный свайп
+                if (dx > 0 && this.direction !== 'left') {
+                    this.nextDirection = 'right';
+                } else if (dx < 0 && this.direction !== 'right') {
+                    this.nextDirection = 'left';
+                }
+            } else {
+                // Вертикальный свайп
+                if (dy > 0 && this.direction !== 'up') {
+                    this.nextDirection = 'down';
+                } else if (dy < 0 && this.direction !== 'down') {
+                    this.nextDirection = 'up';
+                }
+            }
+        }
+        
+        setupAutoResetLeaderboard() {
+            // Очищаем предыдущий интервал, если был
+            if (this.leaderboardResetInterval) {
+                clearInterval(this.leaderboardResetInterval);
+            }
+            
+            // Устанавливаем новый интервал (1 минута = 60000 мс)
+            this.leaderboardResetInterval = setInterval(() => {
+                if (localStorage.getItem('zmeykaLeaderboard')) {
+                    console.log('Автоматический сброс лидерборда');
+                    localStorage.removeItem('zmeykaLeaderboard');
+                    this.updateLeaderboard();
+                    
+                    // Показываем уведомление о сбросе
+                    const resetMsg = document.createElement('div');
+                    resetMsg.className = 'skin-message';
+                    resetMsg.textContent = 'Лидерборд был автоматически сброшен';
+                    document.body.appendChild(resetMsg);
+                    setTimeout(() => resetMsg.remove(), 2000);
+                }
+            }, 60000); // 1 минута в миллисекундах
+            
+            // Инициализируем лидерборд сразу
+            this.updateLeaderboard();
         }
         
         showScreen(screenId) {
@@ -505,38 +576,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 default: return level;
             }
         }
-        
-        resetLeaderboard() {
-            // Очищаем предыдущий интервал, если был
-            if (this.leaderboardResetInterval) {
-                clearInterval(this.leaderboardResetInterval);
-            }
-            
-            // Устанавливаем новый интервал (3 минуты = 180000 мс)
-            this.leaderboardResetInterval = setInterval(() => {
-                // Проверяем, есть ли данные для сброса
-                if (localStorage.getItem('zmeykaLeaderboard')) {
-                    console.log('Автоматический сброс лидерборда');
-                    localStorage.removeItem('zmeykaLeaderboard');
-                    this.updateLeaderboard();
-                    
-                    // Показываем уведомление о сбросе
-                    const resetMsg = document.createElement('div');
-                    resetMsg.className = 'skin-message';
-                    resetMsg.textContent = 'Лидерборд был автоматически сброшен';
-                    document.body.appendChild(resetMsg);
-                    setTimeout(() => resetMsg.remove(), 2000);
-                }
-            }, 180000); // 3 минуты в миллисекундах
-            
-            // Инициализируем лидерборд сразу
-            this.updateLeaderboard();
-        }
     }
 
     const game = new SnakeGame();
-    game.resetLeaderboard();
-    game.updateLeaderboard();
     
     document.querySelectorAll('.copy-btn').forEach(btn => {
         btn.addEventListener('click', function() {
